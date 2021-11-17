@@ -2,15 +2,26 @@
 	"name": "demo",
 	"version": "1.0.0",
 	"description": "",
-	"main": "index.js",
+	"private": true,
 	"scripts": {
 		"dev": "tailwindcss -i src/tailwind.css -o dist/tailwind.css --watch",
-		"server": "live-server . --no-css-inject"
+		"server": "nodemon server.js",
+		"browser": "npx browserify src/index.js -o dist/main.js"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
-		"tailwindcss": "^2.2.15"
-	}
+		"tailwindcss": "^2.2.19"
+	},
+	"dependencies": {
+		"@ffmpeg/core": "^0.10.0",
+		"@ffmpeg/ffmpeg": "^0.10.1",
+		"browserify-shim": "^3.8.14",
+		"cors": "^2.8.5",
+		"express": "^4.17.1",
+		"nodemon": "^2.0.15",
+		"yarn": "^1.22.17"
+	},
+	"main": "index.js"
 }
