@@ -5,8 +5,8 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Screen Recorder</title>
-	
-	<link rel="stylesheet" href="tailwind1.css" />
+	<link rel="stylesheet" href="tailwind.css" />
+	<link rel="shortcut icon" href="/favicon.ico" />
 </head>
 <body class="bg-gray-800 text-white">
 	
@@ -25,7 +25,7 @@
 				<!-- <input class="seconds-input" type="text"> -->
 			</h2>
 
-			<video src="" autplay class="video-feedback bg-black w-full h-auto mb-4"></video>
+			<video src="" autplay class="video-feedback bg-black w-full h-auto mb-4" ></video>
 
 			<div class="flex flex-wrap -mx-4 mb-8">
 				<button class="start-recording mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50">
@@ -41,19 +41,48 @@
 					Recorded video
 				</h2>
 
-				<video src="" class="recorded-video bg-black w-full h-auto mb-8"></video>
+				<video src="" class="recorded-video bg-black w-full h-auto mb-8" controls="controls"></video>
+				<div id ="Start">
+					<label for="Start Time">Start Time:</label>
+					<input type="number" placeholder="M:" class = "Minutes"  name ="Start Time" style="color:black;width:5%;">
+					<input type="number" placeholder="S:" class ="Seconds" style="position:absolute; margin-right:40%; color:black;width:5%;">
+				</div>
+
+				<div id="End">
+					<label for="End Time">End Time:</labelx>
+					<input type="number" class = "Minutes" placeholder="M:" name ="End Time" style="color:black; width:5%;">
+					<input type="number" class ="Seconds" placeholder="S:" style="position:absolute; margin-right:40%; color:black;width:5%;">
+				</div>
+				
+				<div class="flex flex-wrap -mx-4 mb-8">
+					<button class="cut-video mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50">
+						Cut
+					</button>
+
+				</div>	
+
 				<div class="flex flex-wrap -mx-4">
-					<a class="download-video text-center mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50" disabled>
+					<a class="download-video text-center mx-4 flex-1 bg-gradient-to-br from-purple-500 to to-pink-500 p-4 uppercase text-lg font-bold transition-all duration-300 hover:opacity-90 disabled:opacity-50"  disabled>
 						Download
 					</a>
 				</div>
-				<video id="output-video" controls></video><br/>
-    			<input type="file" id="uploader">
+
+				</div>
+
+				<!--
+					RECOMMENDED
+
+					You should remove this video output and input
+					
+					<video id="output-video" controls></video><br/>
+    				
+					<input type="file" id="uploader">
+				-->
     			<p id="message"></p>
 			</div>
 		</div>
-	</main>
-
-	<script src="index.js"></script>
+	</main>   
+ 
+	<script type="module" src="main.js"></script>
 </body>
 </html>
