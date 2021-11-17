@@ -94,7 +94,6 @@ let prevStartSecond = 0,
 		if(ffmpeg.isLoaded()){
 			ffmpeg.FS('writeFile', 'video.mp4', await fetchFile(recordedVideo.src));
 			await ffmpeg.run('-i', 'video.mp4', '-ss', `${(startMinute.value * 60) + startSecond.value}`, '-to', `${(endMinute.value * 60) + endSecond.value}`, 'output.mp4');
-			message.innerHTML = 'Complete trimming';
 			const data = ffmpeg.FS('readFile', 'output.mp4');
 
 			recordedVideo.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
