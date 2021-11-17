@@ -186,31 +186,30 @@ process.umask = function() { return 0; };
 
 },{}],2:[function(require,module,exports){
 module.exports={
-  "_from": "@ffmpeg/ffmpeg",
+  "_from": "@ffmpeg/ffmpeg@^0.10.1",
   "_id": "@ffmpeg/ffmpeg@0.10.1",
   "_inBundle": false,
   "_integrity": "sha512-ChQkH7Rh57hmVo1LhfQFibWX/xqneolJKSwItwZdKPcLZuKigtYAYDIvB55pDfP17VtR1R77SxgkB2/UApB+Og==",
   "_location": "/@ffmpeg/ffmpeg",
   "_phantomChildren": {},
   "_requested": {
-    "type": "tag",
+    "type": "range",
     "registry": true,
-    "raw": "@ffmpeg/ffmpeg",
+    "raw": "@ffmpeg/ffmpeg@^0.10.1",
     "name": "@ffmpeg/ffmpeg",
     "escapedName": "@ffmpeg%2fffmpeg",
     "scope": "@ffmpeg",
-    "rawSpec": "",
+    "rawSpec": "^0.10.1",
     "saveSpec": null,
-    "fetchSpec": "latest"
+    "fetchSpec": "^0.10.1"
   },
   "_requiredBy": [
-    "#USER",
     "/"
   ],
   "_resolved": "https://registry.npmjs.org/@ffmpeg/ffmpeg/-/ffmpeg-0.10.1.tgz",
   "_shasum": "3dacf3985de9c83a95fbf79fe709920cc009b00a",
-  "_spec": "@ffmpeg/ffmpeg",
-  "_where": "C:\\Users\\ilove\\Documents\\GitHub\\Video-Clip",
+  "_spec": "@ffmpeg/ffmpeg@^0.10.1",
+  "_where": "C:\\Users\\ilove\\Documents\\Godot\\Video-Clip",
   "author": {
     "name": "Jerome Wu",
     "email": "jeromewus@gmail.com"
@@ -1594,212 +1593,212 @@ void (function(root, factory) {
 
 },{}],15:[function(require,module,exports){
 let stream = null,
-	audio = null,
-	mixedStream = null,
-	chunks = [], 
-	recorder = null,
-	startButton = null,
-	stopButton = null,
-	cutButton = null, // new button
-	downloadButton = null,
-	recordedVideo = null, 
-	uploader = null,
-	start = null, 
-	end = null, 
-	startSecond = null,
-	startMinute = null,
-	endSecond = null,
-	endMinute = null;
+audio = null,
+mixedStream = null,
+chunks = [], 
+recorder = null,
+startButton = null,
+stopButton = null,
+cutButton = null, // new button
+downloadButton = null,
+recordedVideo = null, 
+uploader = null,
+start = null, 
+end = null, 
+startSecond = null,
+startMinute = null,
+endSecond = null,
+endMinute = null;
 
 let prevStartSecond = 0,
-	prevStartMinute = 0,
-	prevEndSecond = 0,
-	prevEndMinute = 0;
+prevStartMinute = 0,
+prevEndSecond = 0,
+prevEndMinute = 0;
 
-	const { createFFmpeg, fetchFile } = require('@ffmpeg/ffmpeg');
+const { createFFmpeg, fetchFile } = require('@ffmpeg/ffmpeg');
 
-	const ffmpeg = createFFmpeg({ 
-		log: true });
+const ffmpeg = createFFmpeg({ 
+	log: true });
 
-	(async () => {
-		await ffmpeg.load();
-	})();
-	
-	async function setupStream () {
-		try {
-			stream = await navigator.mediaDevices.getDisplayMedia({
-				video: true
-			});
-			
-			audio = await navigator.mediaDevices.getUserMedia({
-				audio: {
-					echoCancellation: true,
-					noiseSuppression: true,
-					sampleRate: 44100,
-				},
-			});
-			
-			setupVideoFeedback();
-		} catch (err) {
-			console.error(err)
-		}
-	}
-	
-	function setupVideoFeedback() {
-		if (stream) {
-			const video = document.querySelector('.video-feedback');
-			video.srcObject = stream;
-			video.play();
-		} else {
-			console.warn('No stream available');
-		}
-	}
-	
-	async function startRecording () {
-		await setupStream();
+(async () => {
+	await ffmpeg.load();
+})();
+
+async function setupStream () {
+	try {
+		stream = await navigator.mediaDevices.getDisplayMedia({
+			video: true
+		});
 		
-		if (stream && audio) {
-			mixedStream = new MediaStream([...stream.getTracks(), ...audio.getTracks()]);
-			recorder = new MediaRecorder(mixedStream);
-			recorder.ondataavailable = handleDataAvailable;
-			recorder.onstop = handleStop;
-			recorder.start(1000);
-			start = Date.now();
-			startButton.disabled = true;
-			stopButton.disabled = false;
-			
-			console.log('Recording started');
-		} else {
-			console.warn('No stream available.');
-		}
-	}
-	
-	function stopRecording () {
-		recorder.stop();
+		audio = await navigator.mediaDevices.getUserMedia({
+			audio: {
+				echoCancellation: true,
+				noiseSuppression: true,
+				sampleRate: 44100,
+			},
+		});
 		
-		startButton.disabled = false;
-		stopButton.disabled = true;
+		setupVideoFeedback();
+	} catch (err) {
+		console.error(err)
 	}
-	
-	function handleDataAvailable (e) {
-		chunks.push(e.data);
+}
+
+function setupVideoFeedback() {
+	if (stream) {
+		const video = document.querySelector('.video-feedback');
+		video.srcObject = stream;
+		video.play();
+	} else {
+		console.warn('No stream available');
 	}
+}
+
+async function startRecording () {
+	await setupStream();
 	
-	async function trim() {
-
-		if(ffmpeg.isLoaded()){
-			ffmpeg.FS('writeFile', 'video.mp4', await fetchFile(recordedVideo.src));
-			await ffmpeg.run('-i', 'video.mp4', '-ss', `${(startMinute.value * 60) + startSecond.value}`, '-to', `${(endMinute.value * 60) + endSecond.value}`, 'output.mp4');
-			message.innerHTML = 'Complete trimming';
-			const data = ffmpeg.FS('readFile', 'output.mp4');
-
-			recordedVideo.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
-
-			downloadButton.href = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
-			downloadButton.download = 'video.mp4';
-			downloadButton.disabled = false;
-		}
-		else { 
-			console.error('wait until ffmpeg is loaded');
-		}
-      };
-
-
-	function handleStop (e) {
-		// chunks.splice(1, chunks.length-10);
+	if (stream && audio) {
+		mixedStream = new MediaStream([...stream.getTracks(), ...audio.getTracks()]);
+		recorder = new MediaRecorder(mixedStream);
+		recorder.ondataavailable = handleDataAvailable;
+		recorder.onstop = handleStop;
+		recorder.start(1000);
+		start = Date.now();
+		startButton.disabled = true;
+		stopButton.disabled = false;
 		
-		end = (Date.now() - start) / 1000; // to Seconds
-		console.log(end);
-		const options = {mimeType: 'video/mp4'};
-		const blob = new Blob(chunks, options);
-		chunks = [];
-		startSecond.value = 0;
-		startMinute.value = 0;
-		endSecond.value = end % 60;
-		let i = 0;
-		while(end > 60){
-			end -= 60;
-			i++;
-		};
-		endMinute.value = i;
+		console.log('Recording started');
+	} else {
+		console.warn('No stream available.');
+	}
+}
 
-		downloadButton.href = URL.createObjectURL(blob);
+function stopRecording () {
+	recorder.stop();
+	
+	startButton.disabled = false;
+	stopButton.disabled = true;
+}
+
+function handleDataAvailable (e) {
+	chunks.push(e.data);
+}
+
+async function trim() {
+
+	if(ffmpeg.isLoaded()){
+		ffmpeg.FS('writeFile', 'video.mp4', await fetchFile(recordedVideo.src));
+		await ffmpeg.run('-i', 'video.mp4', '-ss', `${(startMinute.value * 60) + startSecond.value}`, '-to', `${(endMinute.value * 60) + endSecond.value}`, 'output.mp4');
+		message.innerHTML = 'Complete trimming';
+		const data = ffmpeg.FS('readFile', 'output.mp4');
+
+		recordedVideo.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
+
+		downloadButton.href = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
 		downloadButton.download = 'video.mp4';
 		downloadButton.disabled = false;
-		recordedVideo.src = URL.createObjectURL(blob);
-		recordedVideo.load();
-		recordedVideo.duration = end;
-		recordedVideo.onloadeddata = function() {
-		const rc = document.querySelector(".recorded-video-wrap");
-		rc.classList.remove("hidden");
-		rc.scrollIntoView({ behavior: "smooth", block: "start" });
+	}
+	else { 
+		console.error('wait until ffmpeg is loaded');
+	}
+  };
 
-		recordedVideo.play();
-		}
 
-		stream.getTracks().forEach((track) => track.stop());
-		audio.getTracks().forEach((track) => track.stop());
+function handleStop (e) {
+	// chunks.splice(1, chunks.length-10);
+	
+	end = (Date.now() - start) / 1000; // to Seconds
+	console.log(end);
+	const options = {mimeType: 'video/mp4'};
+	const blob = new Blob(chunks, options);
+	chunks = [];
+	startSecond.value = 0;
+	startMinute.value = 0;
+	endSecond.value = end % 60;
+	let i = 0;
+	while(end > 60){
+		end -= 60;
+		i++;
+	};
+	endMinute.value = i;
+	downloadButton.href = URL.createObjectURL(blob);
+	downloadButton.download = 'video.mp4';
+	downloadButton.disabled = false;
 
-		console.log('Recording stopped');
+	recordedVideo.src = URL.createObjectURL(blob);
+	recordedVideo.load();
+	recordedVideo.onloadeddata = function() {
+	const rc = document.querySelector(".recorded-video-wrap");
+	rc.classList.remove("hidden");
+	rc.scrollIntoView({ behavior: "smooth", block: "start" });
+
+	recordedVideo.play();
+	}
+
+	stream.getTracks().forEach((track) => track.stop());
+	audio.getTracks().forEach((track) => track.stop());
+
+	console.log('Recording stopped');
 }
 
 
 function getDuration(){
-	start
+start
 }
 window.addEventListener('load', () => {
-	startButton = document.querySelector('.start-recording');
-	stopButton = document.querySelector('.stop-recording');
-	downloadButton = document.querySelector('.download-video');
-	recordedVideo = document.querySelector('.recorded-video');
-	cutButton = document.querySelector('.cut-video');
-	uploader = document.getElementById('uploader');
+startButton = document.querySelector('.start-recording');
+stopButton = document.querySelector('.stop-recording');
+downloadButton = document.querySelector('.download-video');
+recordedVideo = document.querySelector('.recorded-video');
+cutButton = document.querySelector('.cut-video');
+uploader = document.getElementById('uploader');
 
-	startSecond = document.querySelector("#Start .Seconds");
-	startMinute = document.querySelector("#Start .Minutes");
-	endSecond = document.querySelector("#End .Seconds");
-	endMinute = document.querySelector("#End .Minutes");
+startSecond = document.querySelector("#Start .Seconds");
+startMinute = document.querySelector("#Start .Minutes");
+endSecond = document.querySelector("#End .Seconds");
+endMinute = document.querySelector("#End .Minutes");
 
 
 
-	startSecond.addEventListener('change', () => {
-		if((startMinute.value * 60) + startSecond.value <= end){
-			prevStartSecond = startSecond.value;
-		}
-		else { 
-			startSecond.value = prevStartSecond
-		};
-	});
+startSecond.addEventListener('change', () => {
+	if((startMinute.value * 60) + startSecond.value <= end){
+		prevStartSecond = startSecond.value;
+	}
+	else { 
+		startSecond.value = prevStartSecond
+	};
+});
 
-	startMinute.addEventListener('change', () => {
-		if((startMinute.value * 60) + startSecond.value <= end){
-			prevStartMinute = startMinute.value;
-		}
-		else { 
-			startMinute.value = prevStartMinute
-		};
-	});
+startMinute.addEventListener('change', () => {
+	if((startMinute.value * 60) + startSecond.value <= end){
+		prevStartMinute = startMinute.value;
+	}
+	else { 
+		startMinute.value = prevStartMinute
+	};
+});
 
-	endSecond.addEventListener('change', () => {
-		if((endMinute.value * 60) + endSecond.value <= end){
-			prevEndSecond = endSecond.value;
-		}
-		else { 
-			endSecond.value = prevEndSecond
-		};
-	});
+endSecond.addEventListener('change', () => {
+	if((endMinute.value * 60) + endSecond.value <= end){
+		prevEndSecond = endSecond.value;
+	}
+	else { 
+		endSecond.value = prevEndSecond
+	};
+});
 
-	endMinute.addEventListener('change', () => {
-		if((endMinute.value * 60) + endSecond.value <= end){
-			prevEndMinute = endMinute.value;
-		}
-		else { 
-			endMinute.value = prevEndMinute;
-		};
-	});
+endMinute.addEventListener('change', () => {
+	if((endMinute.value * 60) + endSecond.value <= end){
+		prevEndMinute = endMinute.value;
+	}
+	else { 
+		endMinute.value = prevEndMinute;
+	};
+});
 
-	cutButton.addEventListener('click', trim)
-	startButton.addEventListener('click', startRecording);
-	stopButton.addEventListener('click', stopRecording);
+cutButton.addEventListener('click', trim)
+startButton.addEventListener('click', startRecording);
+stopButton.addEventListener('click', stopRecording);
 })
+
 },{"@ffmpeg/ffmpeg":9}]},{},[15]);
